@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>縮網址服務</title>
+    <style>
+        /* 基礎設定 */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f4f9; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 調整容器：寬度 100%，並設定適當的內距 */
+        .container { 
+            background: white; 
+            padding: 40px; 
+            box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
+            width: 100%;            /* 撐滿寬度 */
+            min-height: 250px;      /* 設定最小高度 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* 內容物包裝，避免文字在超寬螢幕散得太開（可選） */
+        .content-wrapper {
+            max-width: 1200px; /* 如果想要無限寬，把這一行刪除即可 */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h2 { margin-top: 0; color: #333; }
+
+        /* 讓輸入框跟按鈕並排或垂直佔滿 */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input[type="url"] { 
+            flex: 1; /* 讓輸入框佔據剩餘空間 */
+            padding: 12px 15px; 
+            border: 2px solid #ddd; 
+            border-radius: 6px; 
+            font-size: 16px;
+            outline: none;
+        }
+
+        input[type="url"]:focus { border-color: #007bff; }
+
+        button { 
+            padding: 12px 30px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .result { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background-color: #e9ecef; 
+            border-radius: 6px; 
+            display: none; 
+            border-left: 5px solid #28a745;
+        }
+
+        .result a { color: #007bff; font-size: 18px; font-weight: bold; word-break: break-all; }
+
+        .error { color: #dc3545; margin-top: 10px; font-weight: bold; display: none; }
+
+        /* 手機版調整 */
+        @media (max-width: 600px) {
+            .input-group { flex-direction: column; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="content-wrapper">
+        <h2>縮網址服務</h2>
+        <div class="input-group">
+            <input type="url" id="longUrl" placeholder="請貼上原始網址 (https://...)" required>
+            <button onclick="shortenUrl()">縮短網址</button>
+        </div>
+
+        <div id="errorMsg" class="error">❌ 發生錯誤，請檢查網址格式或伺服器狀態</div>
+
+        <div id="resultArea" class="result">
+            <strong>✨ 您的縮網址已生成：</strong><br><br>
+            <a id="shortLink" href="#" target="_blank"></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function shortenUrl() {
+        const urlInput = document.getElementById('longUrl');
+        const resultArea = document.getElementById('resultArea');
+        const shortLink = document.getElementById('shortLink');
+        const errorMsg = document.getElementById('errorMsg');
+
+        resultArea.style.display = 'none';
+        errorMsg.style.display = 'none';
+
+        if (!urlInput.value) return;
+
+        try {
+            const response = await fetch('https://decades-agreements-tiger-region.trycloudflare.com/api/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlInput.value })
+            });
+
+            if (!response.ok) throw new Error();
+
+            const data = await response.json();
+            shortLink.href = data.short_url;
+            shortLink.textContent = data.short_url;
+            resultArea.style.display = 'block';
+        } catch (e) {
+            errorMsg.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
