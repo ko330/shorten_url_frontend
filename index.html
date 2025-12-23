@@ -101,7 +101,7 @@
         submitBtn.textContent = '處理中...';
 
         try {
-            const response = await fetch('https://decades-agreements-tiger-region.trycloudflare.com', {
+            const response = await fetch('https://decades-agreements-tiger-region.trycloudflare.com/api/shoten', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: urlInput.value })
